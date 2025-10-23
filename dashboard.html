@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFT IPR Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>NFT IPR Dashboard</h1>
+        <p id="userWallet"></p>
+        <button id="logoutBtn">Logout</button>
+
+        <h2>Mint NFT</h2>
+        <button id="mintBtn">Mint NFT</button>
+
+        <h2>Grant License</h2>
+        <input type="text" id="tokenId" placeholder="Token ID">
+        <input type="text" id="licensee" placeholder="License Address">
+        <input type="text" id="rights" placeholder="Rights">
+        <input type="number" id="duration" placeholder="Duration in minutes">
+        <button id="grantBtn">Grant License</button>
+
+        <h2>View Licenses</h2>
+        <input type="text" id="viewTokenId" placeholder="Token ID">
+        <button id="viewBtn">View Licenses</button>
+        <div id="licenseList"></div>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>
