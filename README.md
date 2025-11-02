@@ -1,5 +1,30 @@
 # NFT IPR Web App
+# How to Use the Web App
 
+    Install MetaMask and unlock your wallet
+
+    Open the web app (or run locally using npm start)
+
+    Click “Connect MetaMask” to authenticate your wallet
+
+    Click “Mint NFT” to mint a new token
+
+    Enter details like token ID, licensee, rights, and duration → click “Grant License”
+
+    View all license details and expiry times in the dashboard
+
+    Click “Logout” to safely clear your wallet and session
+##Install MetaMask
+
+    Visit https://metamask.io/
+
+    Install the MetaMask browser extension
+
+    Create or import your wallet
+
+    Keep MetaMask unlocked while using the app
+
+    🔑 MetaMask is required to connect your wallet and access all blockchain features
 ## Overview
 The NFT IPR Web App is a web-based application designed to simulate Intellectual Property Rights (IPR) management using blockchain concepts. It demonstrates NFT minting, license granting, and tracking of license expiry, all integrated into a dashboard interface.
 

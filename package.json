@@ -1,4 +1,11 @@
 {
+  "name": "nft_ipr_web_page",
+  "version": "1.0.0",
+  "description": "NFT IP Rights Web Page",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx live-server"
+  },
   "dependencies": {
     "nft.storage": "^7.2.0"
   }

@@ -12,6 +12,9 @@
         <button id="logoutBtn">Logout</button>
 
         <h2>Mint NFT</h2>
+        <input type="text" id="nftName" placeholder="NFT Name">
+        <input type="text" id="nftDescription" placeholder="NFT Description">
+        <input type="file" id="nftImage" accept="image/*">
         <button id="mintBtn">Mint NFT</button>
 
         <h2>Grant License</h2>
@@ -26,6 +29,8 @@
         <button id="viewBtn">View Licenses</button>
         <div id="licenseList"></div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>
