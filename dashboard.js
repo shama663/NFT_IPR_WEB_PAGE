@@ -1,84 +1,92 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const userWallet = document.getElementById("userWallet");
-  const mintBtn = document.getElementById("mintBtn");
-  const grantBtn = document.getElementById("grantBtn");
-  const viewBtn = document.getElementById("viewBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const licenseList = document.getElementById("licenseList");
+let currentTokenId = 0;
+let licenseData = {};
+const mintBtn = document.getElementById("mintBtn");
+const grantBtn = document.getElementById("grantBtn");
+const viewBtn = document.getElementById("viewBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const messageBox = document.getElementById("message");
+const licenseBox = document.getElementById("licenseDetails");
 
-  const wallet = localStorage.getItem("wallet");
-  if (!wallet) {
-    window.location.href = "login.html";
+mintBtn.addEventListener("click", () => {
+  const name = document.getElementById("nftName").value.trim();
+  const desc = document.getElementById("nftDescription").value.trim();
+  const file = document.getElementById("nftFile").files[0];
+
+  if (!name || !desc || !file) {
+    showMessage("⚠️ Please fill all fields and select a file!", "error");
     return;
   }
-  userWallet.innerText = "Wallet: " + wallet;
 
-  if (!localStorage.getItem("tokens")) localStorage.setItem("tokens", JSON.stringify([]));
-  if (!localStorage.getItem("licenses")) localStorage.setItem("licenses", JSON.stringify([]));
-
-  let tokens = JSON.parse(localStorage.getItem("tokens"));
-  let licenses = JSON.parse(localStorage.getItem("licenses"));
-
-  mintBtn.onclick = () => {
-    const nextId = tokens.length + 1;
-    if (tokens.includes(nextId)) {
-      alert(`NFT ${nextId} already minted`);
-      return;
-    }
-    tokens.push(nextId);
-    localStorage.setItem("tokens", JSON.stringify(tokens));
-    alert(`NFT ${nextId} minted successfully`);
-  };
-
-  grantBtn.onclick = () => {
-    const tokenId = parseInt(document.getElementById("tokenId").value);
-    const licensee = document.getElementById("licensee").value;
-    const rights = document.getElementById("rights").value;
-    const duration = parseInt(document.getElementById("duration").value);
-
-    if (!tokenId || !licensee || !rights || !duration) {
-      alert("Please fill all license details before granting.");
-      return;
-    }
-
-    if (!tokens.includes(tokenId)) {
-      alert(`Token ${tokenId} not minted yet`);
-      return;
-    }
-
-    const existing = licenses.find(l => l.tokenId === tokenId && l.expiry > Date.now());
-    if (existing) {
-      alert(`Token ${tokenId} already has an active license until ${new Date(existing.expiry).toLocaleTimeString()}`);
-      return;
-    }
-
-    const expiry = Date.now() + duration * 60000;
-    licenses.push({ tokenId, licensee, rights, expiry });
-    localStorage.setItem("licenses", JSON.stringify(licenses));
-    alert(`License granted for Token ${tokenId} until ${new Date(expiry).toLocaleTimeString()}`);
-  };
-
-  viewBtn.onclick = () => {
-    const tokenId = parseInt(document.getElementById("viewTokenId").value);
-    const filtered = licenses.filter(l => l.tokenId === tokenId);
-    licenseList.innerHTML = "";
-
-    if (filtered.length === 0) {
-      licenseList.innerHTML = `<p>No licenses for token ${tokenId}</p>`;
-      return;
-    }
-
-    filtered.forEach(l => {
-      const status = l.expiry > Date.now() ? "Active" : "Expired";
-      const time = new Date(l.expiry).toLocaleTimeString();
-      licenseList.innerHTML += `<p>Licensee: <b>${l.licensee}</b>, Rights: ${l.rights}, Status: ${status}, Expires at: ${time}</p>`;
-    });
-  };
-
-  logoutBtn.onclick = () => {
-    localStorage.removeItem("wallet");
-    localStorage.removeItem("tokens");
-    localStorage.removeItem("licenses");
-    window.location.href = "login.html";
-  };
+  currentTokenId++;
+  showMessage(`✅ NFT Minted Successfully!
+  Token ID: ${currentTokenId}
+  Name: ${name}
+  Description: ${desc}
+  File: ${file.name}`, "success");
 });
+
+grantBtn.addEventListener("click", () => {
+  const tokenId = document.getElementById("tokenId").value;
+  const licensee = document.getElementById("licensee").value.trim();
+  const rights = document.getElementById("rights").value.trim();
+  const duration = parseInt(document.getElementById("duration").value);
+
+  if (!tokenId || !licensee || !rights || !duration) {
+    showMessage("⚠️ Please fill all license fields!", "error");
+    return;
+  }
+
+  const now = new Date();
+  const expiry = new Date(now.getTime() + duration * 60000);
+
+  licenseData[tokenId] = {
+    owner: "0xE45F...123A",
+    licensee,
+    rights,
+    issued: now,
+    expiry,
+  };
+
+  showMessage(`✅ License granted for Token ${tokenId} to ${licensee}.`, "success");
+});
+
+viewBtn.addEventListener("click", () => {
+  const tokenId = document.getElementById("viewTokenId").value;
+  if (!tokenId) {
+    showMessage("⚠️ Please enter Token ID to view license!", "error");
+    return;
+  }
+
+  const data = licenseData[tokenId];
+  if (!data) {
+    licenseBox.innerHTML = `<p class="no-license">No license found for Token ${tokenId}.</p>`;
+    return;
+  }
+
+  const status = Date.now() > data.expiry.getTime() ? "Expired ❌" : "Active ✅";
+
+  licenseBox.innerHTML = `
+    <div class="license-card">
+      <p><strong>Owner:</strong> ${data.owner}</p>
+      <p><strong>Licensee:</strong> ${data.licensee}</p>
+      <p><strong>Rights:</strong> ${data.rights}</p>
+      <p><strong>Status:</strong> ${status}</p>
+      <p><strong>Issued:</strong> ${data.issued.toLocaleString()}</p>
+      <p><strong>Expires:</strong> ${data.expiry.toLocaleString()}</p>
+    </div>
+  `;
+});
+
+logoutBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to logout?")) {
+    localStorage.clear();
+    showMessage("👋 Logged out successfully!", "success");
+    setTimeout(() => (window.location.href = "login.html"), 1500);
+  }
+});
+
+function showMessage(text, type) {
+  messageBox.textContent = text;
+  messageBox.style.color = type === "error" ? "red" : "green";
+  messageBox.style.fontWeight = "bold";
+}

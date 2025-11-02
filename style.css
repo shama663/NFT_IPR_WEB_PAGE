@@ -1,40 +1,96 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f0f0f5;
-    margin: 0;
-    padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #ffd6e0, #ffe8f0);
+  margin: 0;
+  padding: 0;
 }
 
-.container, .dashboard-container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 25px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px #ccc;
+.dashboard-container {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-h1, h2, h2 {
-    text-align: center;
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 {
+  color: #f15b94;
+  font-size: 26px;
+  margin: 0;
+}
+
+.logout-btn {
+  background: #f7a3b8;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.logout-btn:hover {
+  background: #f27991;
+}
+
+section {
+  margin-top: 25px;
+  text-align: center;
+}
+
+h2 {
+  color: #f27991;
 }
 
 input, button {
-    display: block;
-    width: 90%;
-    margin: 10px auto;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+  display: block;
+  width: 85%;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
 }
 
 button {
-    background: #ffb6c1;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
+  background-color: #f4b6c2;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover {
+  background-color: #f18ba7;
 }
 
-button:hover {
-    background: #ff69b4;
-    color: #fff;
+#message {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.license-card {
+  background: #fff4f8;
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.no-license {
+  color: #ff4c68;
+  font-weight: bold;
 }

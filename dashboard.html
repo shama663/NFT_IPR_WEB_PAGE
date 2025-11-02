@@ -1,31 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>NFT IPR Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFT IP Rights Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>NFT IPR Dashboard</h1>
-        <p id="userWallet"></p>
-        <button id="logoutBtn">Logout</button>
+  <div class="dashboard-container">
+    <header>
+      <h1>🌸 NFT IP Rights Dashboard</h1>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </header>
 
-        <h2>Mint NFT</h2>
-        <button id="mintBtn">Mint NFT</button>
+    <section class="mint-section">
+      <h2>Mint Your NFT</h2>
+      <input type="text" id="nftName" placeholder="Enter NFT Name" />
+      <input type="text" id="nftDescription" placeholder="Enter Description" />
+      <input type="file" id="nftFile" accept="*" />
+      <button id="mintBtn">Mint NFT</button>
+    </section>
 
-        <h2>Grant License</h2>
-        <input type="text" id="tokenId" placeholder="Token ID">
-        <input type="text" id="licensee" placeholder="License Address">
-        <input type="text" id="rights" placeholder="Rights">
-        <input type="number" id="duration" placeholder="Duration in minutes">
-        <button id="grantBtn">Grant License</button>
+    <section class="license-section">
+      <h2>Grant License</h2>
+      <input type="number" id="tokenId" placeholder="Enter Token ID" />
+      <input type="text" id="licensee" placeholder="Licensee Name / ID" />
+      <input type="text" id="rights" placeholder="Rights (View / Update / etc)" />
+      <input type="number" id="duration" placeholder="Duration (in minutes)" />
+      <button id="grantBtn">Grant License</button>
+    </section>
 
-        <h2>View Licenses</h2>
-        <input type="text" id="viewTokenId" placeholder="Token ID">
-        <button id="viewBtn">View Licenses</button>
-        <div id="licenseList"></div>
-    </div>
-    <script src="dashboard.js"></script>
+    <section class="view-section">
+      <h2>View License</h2>
+      <input type="number" id="viewTokenId" placeholder="Enter Token ID" />
+      <button id="viewBtn">View License</button>
+      <div id="licenseDetails"></div>
+    </section>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="dashboard.js"></script>
 </body>
 </html>
