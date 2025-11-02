@@ -1,143 +1,117 @@
-let web3;
-let nftContract;
-let userWallet;
-let currentTokenId = 0;
+import { NFTStorage } from "nft.storage";
 
-const contractAddress = "0xddaAd340b0f1Ef65169Ae5E41A8b10776a75482d";
-const nftStorageApiKey = "17a8d371.231ba3f3169046c5842c11dab5f73b26"; // 💖 Replace with your NFT.Storage API key
-const nftStorageEndpoint = "https://api.nft.storage/upload";
+const nftStorageKey = "YOUR_NFT_STORAGE_API_KEY"; // Replace with your real API key
+let userAddress = null;
 
-document.addEventListener("DOMContentLoaded", async () => {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.requestAccounts();
-        userWallet = accounts[0];
-        document.getElementById('userWallet').innerText = `Wallet: ${userWallet}`;
-    } else {
-        alert("Please install MetaMask to use this DApp");
-        return;
-    }
-
-    const response = await fetch('./abi/NFT_IPR.json');
-    const abi = await response.json();
-    nftContract = new web3.eth.Contract(abi, contractAddress);
-
-    attachButtonEvents();
-});
-
-function attachButtonEvents() {
-    document.getElementById('mintBtn').onclick = mintNFT;
-    document.getElementById('grantBtn').onclick = grantLicense;
-    document.getElementById('viewBtn').onclick = viewLicense;
-    document.getElementById('logoutBtn').onclick = logout;
-}
-
-async function mintNFT() {
-    const name = document.getElementById('nftName').value;
-    const description = document.getElementById('nftDescription').value;
-    const fileInput = document.getElementById('nftImage');
-    const file = fileInput.files[0];
-
-    if (!name || !description || !file) {
-        alert("Please fill all NFT details and upload an image");
-        return;
-    }
-
+// Connect MetaMask wallet
+async function connectWallet() {
+  if (window.ethereum) {
     try {
-        const metadata = await uploadToNFTStorage(name, description, file);
-        currentTokenId++;
-
-        await nftContract.methods.mintNFT(userWallet, metadata.url).send({ from: userWallet });
-        alert(`✅ NFT Minted!\nToken ID: ${currentTokenId}\nIPFS Metadata: ${metadata.url}`);
-    } catch (err) {
-        console.error(err);
-        alert("❌ Error minting NFT: " + err.message);
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      userAddress = accounts[0];
+      document.getElementById("walletAddress").innerText = userAddress;
+      alert("Wallet connected successfully!");
+    } catch (error) {
+      console.error("User rejected MetaMask connection:", error);
+      alert("Connection rejected. Please allow MetaMask access.");
     }
+  } else {
+    alert("MetaMask not found. Please install MetaMask first.");
+  }
 }
 
-async function uploadToNFTStorage(name, description, file) {
-    const formData = new FormData();
-    formData.append("file", file);
+// Mint NFT
+async function mintNFT() {
+  try {
+    const file = document.querySelector("#nftFile").files[0];
+    const name = document.querySelector("#nftName").value.trim();
+    const description = document.querySelector("#nftDescription").value.trim();
 
-    const imageResponse = await fetch(nftStorageEndpoint, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${nftStorageApiKey}` },
-        body: formData
-    });
-    const imageData = await imageResponse.json();
-    const imageUrl = `ipfs://${imageData.value.cid}`;
+    if (!file || !name || !description) {
+      alert("Please fill all fields and choose a file before minting.");
+      return;
+    }
+
+    const client = new NFTStorage({ token: nftStorageKey });
+
+    // Upload file to NFT.Storage
+    const cid = await client.storeBlob(file);
+    console.log("NFT uploaded successfully. CID:", cid);
 
     const metadata = {
-        name,
-        description,
-        image: imageUrl,
-        creator: userWallet,
-        createdAt: new Date().toISOString()
+      name,
+      description,
+      image: `https://${cid}.ipfs.nftstorage.link/`,
+      timestamp: new Date().toLocaleString(),
+      owner: userAddress,
     };
 
-    const metaResponse = await fetch(nftStorageEndpoint, {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${nftStorageApiKey}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(metadata)
-    });
+    console.log("NFT Metadata:", metadata);
 
-    const metaData = await metaResponse.json();
-    const metadataUrl = `ipfs://${metaData.value.cid}`;
-    return { url: metadataUrl };
-}
-
-let licenseData = {};
-
-async function grantLicense() {
-    const tokenId = document.getElementById('tokenId').value;
-    const licensee = document.getElementById('licensee').value;
-    const rights = document.getElementById('rights').value;
-    const duration = parseInt(document.getElementById('duration').value);
-
-    if (!tokenId || !licensee || !rights || !duration) {
-        alert("Please fill all fields");
-        return;
-    }
-
-    if (licenseData[tokenId] && licenseData[tokenId].expiry > Date.now()) {
-        alert(`Token ${tokenId} already has an active license until ${new Date(licenseData[tokenId].expiry).toLocaleTimeString()}`);
-        return;
-    }
-
-    const expiryTime = Date.now() + duration * 60000;
-    licenseData[tokenId] = { licensee, rights, expiry: expiryTime };
-
-    alert(`✅ License granted for Token ${tokenId} until ${new Date(expiryTime).toLocaleTimeString()}`);
-}
-
-function viewLicense() {
-    const tokenId = document.getElementById('viewTokenId').value;
-    if (!tokenId) {
-        alert("Enter Token ID");
-        return;
-    }
-
-    const data = licenseData[tokenId];
-    if (!data) {
-        document.getElementById('licenseList').innerText = `No license found for Token ${tokenId}`;
-        return;
-    }
-
-    const status = Date.now() > data.expiry ? "Expired" : "Active";
-    document.getElementById('licenseList').innerText = `
-Token ${tokenId} License:
-Licensee: ${data.licensee}
-Rights: ${data.rights}
-Status: ${status}
-Expiry: ${new Date(data.expiry).toLocaleTimeString()}
+    // Display NFT in dashboard
+    const dashboard = document.getElementById("nftDashboard");
+    const nftCard = document.createElement("div");
+    nftCard.className = "nft-card";
+    nftCard.innerHTML = `
+      <img src="${metadata.image}" alt="${metadata.name}" class="nft-image"/>
+      <h3>${metadata.name}</h3>
+      <p>${metadata.description}</p>
+      <p><strong>Owner:</strong> ${metadata.owner}</p>
+      <p><strong>Minted On:</strong> ${metadata.timestamp}</p>
+      <a href="${metadata.image}" target="_blank">View on IPFS</a>
     `;
+    dashboard.appendChild(nftCard);
+
+    alert("NFT minted successfully! 🎉");
+  } catch (error) {
+    console.error("Error minting NFT:", error);
+    alert("Error minting NFT: " + error.message);
+  }
 }
 
-function logout() {
-    localStorage.clear();
-    alert("Logged out!");
-    window.location.href = "login.html";
+// Grant License
+function grantLicense() {
+  const licenseName = document.getElementById("licenseName").value;
+  const licenseDuration = document.getElementById("licenseDuration").value;
+
+  if (!licenseName || !licenseDuration) {
+    alert("Please enter license details.");
+    return;
+  }
+
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + parseInt(licenseDuration));
+
+  const licenseInfo = {
+    name: licenseName,
+    duration: licenseDuration,
+    expiry: expiryDate.toLocaleDateString(),
+  };
+
+  const licenseContainer = document.getElementById("licenseDashboard");
+  const licenseCard = document.createElement("div");
+  licenseCard.className = "license-card";
+  licenseCard.innerHTML = `
+    <h3>${licenseInfo.name}</h3>
+    <p>Duration: ${licenseInfo.duration} days</p>
+    <p>Expiry Date: ${licenseInfo.expiry}</p>
+  `;
+  licenseContainer.appendChild(licenseCard);
+
+  alert("License granted successfully!");
 }
+
+// Logout function
+function logout() {
+  userAddress = null;
+  document.getElementById("walletAddress").innerText = "";
+  document.getElementById("nftDashboard").innerHTML = "";
+  document.getElementById("licenseDashboard").innerHTML = "";
+  alert("You have been logged out.");
+}
+
+// Event Listeners
+document.getElementById("connectBtn").addEventListener("click", connectWallet);
+document.getElementById("mintBtn").addEventListener("click", mintNFT);
+document.getElementById("grantBtn").addEventListener("click", grantLicense);
+document.getElementById("logoutBtn").addEventListener("click", logout);
