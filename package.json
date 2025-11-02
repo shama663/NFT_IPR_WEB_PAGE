@@ -8,5 +8,18 @@
   },
   "dependencies": {
     "nft.storage": "^7.2.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shama663/NFT_IPR_WEB_PAGE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/shama663/NFT_IPR_WEB_PAGE/issues"
+  },
+  "homepage": "https://github.com/shama663/NFT_IPR_WEB_PAGE#readme"
 }
