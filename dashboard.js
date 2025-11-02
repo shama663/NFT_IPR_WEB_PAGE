@@ -1,6 +1,6 @@
 import { NFTStorage } from "nft.storage";
 
-const nftStorageKey = "YOUR_NFT_STORAGE_API_KEY"; // Replace with your real API key
+const nftStorageKey = "17a8d371.231ba3f3169046c5842c11dab5f73b26"; // Replace with your real API key
 let userAddress = null;
 
 // Connect MetaMask wallet
