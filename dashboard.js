@@ -1,9 +1,9 @@
-import { NFTStorage } from "nft.storage";
+import { NFTStorage, File } from "nft.storage";
 
-const nftStorageKey = "17a8d371.231ba3f3169046c5842c11dab5f73b26"; // Replace with your real API key
+const nftStorageKey = "17a8d371.231ba3f3169046c5842c11dab5f73b26"; // Replace with your real key
 let userAddress = null;
 
-// Connect MetaMask wallet
+// Connect MetaMask
 async function connectWallet() {
   if (window.ethereum) {
     try {
@@ -34,31 +34,27 @@ async function mintNFT() {
 
     const client = new NFTStorage({ token: nftStorageKey });
 
-    // Upload file to NFT.Storage
-    const cid = await client.storeBlob(file);
-    console.log("NFT uploaded successfully. CID:", cid);
-
-    const metadata = {
+    const metadata = await client.store({
       name,
       description,
-      image: `https://${cid}.ipfs.nftstorage.link/`,
-      timestamp: new Date().toLocaleString(),
-      owner: userAddress,
-    };
+      image: new File([file], file.name, { type: file.type }),
+      properties: {
+        owner: userAddress,
+        mintedAt: new Date().toLocaleString(),
+      },
+    });
 
-    console.log("NFT Metadata:", metadata);
+    console.log("NFT Metadata stored at:", metadata.url);
 
-    // Display NFT in dashboard
     const dashboard = document.getElementById("nftDashboard");
     const nftCard = document.createElement("div");
     nftCard.className = "nft-card";
     nftCard.innerHTML = `
-      <img src="${metadata.image}" alt="${metadata.name}" class="nft-image"/>
-      <h3>${metadata.name}</h3>
-      <p>${metadata.description}</p>
-      <p><strong>Owner:</strong> ${metadata.owner}</p>
-      <p><strong>Minted On:</strong> ${metadata.timestamp}</p>
-      <a href="${metadata.image}" target="_blank">View on IPFS</a>
+      <h3>${name}</h3>
+      <p>${description}</p>
+      <p><strong>Owner:</strong> ${userAddress}</p>
+      <p><strong>Minted On:</strong> ${new Date().toLocaleString()}</p>
+      <a href="${metadata.url}" target="_blank">View on IPFS</a>
     `;
     dashboard.appendChild(nftCard);
 
@@ -82,26 +78,20 @@ function grantLicense() {
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + parseInt(licenseDuration));
 
-  const licenseInfo = {
-    name: licenseName,
-    duration: licenseDuration,
-    expiry: expiryDate.toLocaleDateString(),
-  };
-
   const licenseContainer = document.getElementById("licenseDashboard");
   const licenseCard = document.createElement("div");
   licenseCard.className = "license-card";
   licenseCard.innerHTML = `
-    <h3>${licenseInfo.name}</h3>
-    <p>Duration: ${licenseInfo.duration} days</p>
-    <p>Expiry Date: ${licenseInfo.expiry}</p>
+    <h4>${licenseName}</h4>
+    <p>Duration: ${licenseDuration} days</p>
+    <p>Expiry Date: ${expiryDate.toLocaleDateString()}</p>
   `;
   licenseContainer.appendChild(licenseCard);
 
   alert("License granted successfully!");
 }
 
-// Logout function
+// Logout
 function logout() {
   userAddress = null;
   document.getElementById("walletAddress").innerText = "";
